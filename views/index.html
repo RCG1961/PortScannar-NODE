@@ -2,40 +2,46 @@
 <html>
 <head>
 	<title>Escáner de Puertos</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+	<script defer src="/static/js/jquery-3.3.1.js"></script>
+	<script defer src="/static/js/funcionalidad.js"></script>
 	<meta charset="utf-8">
 </head>
 <body>
 	<div id="contenedor">
 		<div id="top">
 			<div class="left">
-				<label id="servidor"> Servidor: <input type="text" name="host" placeholder="Servidor"> </label>
-				<label  class="puertos">Puerto Inicial:<input type="number" name="puertoInicial" min="1"> </label>
-				<label class="puertos"> Puerto Final: <input type="number" name="puertoFinal" min="1" > </label>
+				<label id="servidor"> Servidor:
+					<input type="text" name="host" placeholder="Servidor" placeholder="198.168.0.0">
+				</label>
+				<label class="puertos">Puerto Inicial:
+					<input type="number" name="puertoInicial" min="1" placeholder="80" id="portinit"
+				</label>
+				<label class="puertos"> Puerto Final:
+					<input type="number" name="puertoFinal" min="1" placeholder="8080" id="portfin">
+				</label>
 				<button id="escanear">Escanear</button>
 			</div>
 			<div class="right">
-				<label>Puertos abiertos: 
-				<select> 
-					<option>Hola</option>
-					<option>Kike</option>
-					<option>&lt;3</option>
-				</select></label>
+				<label>Puertos abiertos:
+					<select>
+						<option>Seleccione..</option>
+						<option>80</option>
+						<option>403</option>
+						<option>300</option>
+					</select>
+				</label>
 				<button>Conectar</button>
 			</div>
 		</div>
 		<div id="center">
 			<h3>Conectado</h3>
-			<p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.	 	</p>
+			<p id="terminal"></p>
 			<div id="contenido"></div>
 		</div>
 		<div id="bottom">
-			<input type="text" name="" id="mensaje">
+			<span>></span>
+			<input type="text" name="" id="mensaje" placeholder="Escribe aquí los comandos">
 		</div>
 	</div>
 </body>

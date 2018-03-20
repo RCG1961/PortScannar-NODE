@@ -3,7 +3,7 @@ var net = require('net');
 var HOST = 'localhost';
 var puertoInicial = 1;
 var puertoFinal = 3000;
-
+var ports = [];
 
 while (puertoInicial < puertoFinal) {
     var port = puertoInicial;
@@ -15,6 +15,7 @@ while (puertoInicial < puertoFinal) {
         client.connect(port, HOST, function (data) {
             console.log(HOST + ' PUERTO ABIERTO: ' + port);
             //client.write('');
+            ports.push(ports);
         });
         client.on('timeout', function (data) {
             client.destroy();
@@ -30,10 +31,12 @@ while (puertoInicial < puertoFinal) {
         })
 
         client.on('error', function (err) {
-            //console.log("Error: "+err.message);
+            // console.log("Error: "+err.message);
         });
 
     })(port);
 
     puertoInicial++;
 }
+
+console.log(ports);
