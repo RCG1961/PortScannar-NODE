@@ -19,5 +19,20 @@ document.getElementById("escanear").addEventListener('click', ()=>{
         data: { 'portinit': portinit, "portfin": portfin, 'host': host},
     }).done(function (msg) {
         console.log(msg);
+        if(msg.length > 0){
+            generarOptionsPorts(msg);
+        }
     })
 });
+
+function generarOptionsPorts(ports) {
+    var selectPuertos = document.getElementById('puertosDisponibles');
+    selectPuertos.innerHTML = '';
+    for (let index = 0; index < ports.length; index++) {
+        const element = ports[index];
+        var option = document.createElement("option");
+        option.text = ports[index];
+        option.value = ports[index];
+        selectPuertos.add(option);
+    }
+}
