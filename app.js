@@ -19,10 +19,10 @@ app.post('/escaner', function (req, res) {
     var HOST = 'localhost';
     var puertoInicial = req.body.portinit;
     var puertoFinal = req.body.portfin;
-    var dato = new Array(), promises = [];
     var openPorts = '';
     var contPorts = 0;
     var datosPort = [];
+    dato= [];
     for (let port = puertoInicial; port <= puertoFinal; port++) {
         var client = new net.Socket();
         client.setTimeout(1000);
@@ -39,6 +39,7 @@ app.post('/escaner', function (req, res) {
 
         client.on('data',(data)=> {
             // console.log('DATA: ' + data);
+            contPorts++;
             client.destroy();
         });
 
@@ -52,9 +53,10 @@ app.post('/escaner', function (req, res) {
         });
         
     }
+    console.log("contPorts:"+  contPorts)
+    console.log("resta: " + (puertoFinal - puertoInicial));
 
     setInterval(()=>{
-        console.log(contPorts);
         if (puertoFinal - puertoInicial == contPorts){
             res.json(dato);
             dato = [];
@@ -69,5 +71,5 @@ function verJson(arr){
 
 app.listen(3000, function () {
     console.log('Listo Para Escanear...');
-    require("openurl").open("http://localhost:3000");
+    //require("openurl").open("http://localhost:3000");
 });
