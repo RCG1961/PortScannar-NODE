@@ -16,9 +16,10 @@ app.get('/', function (req, res) {
 
 var dato = new Array();
 app.post('/escaner', function (req, res) {
-    var HOST = 'localhost';
     var puertoInicial = req.body.portinit;
     var puertoFinal = req.body.portfin;
+    var host = req.body.host;
+    
     var openPorts = '';
     var contPorts = 0;
     var datosPort = [];
@@ -29,8 +30,8 @@ app.post('/escaner', function (req, res) {
         var client = new net.Socket();
         client.setTimeout(1000);
         datosPort = port;
-        client.connect(port, HOST, ()=> {            
-            console.log(HOST + ' PUERTO ABIERTO: ' + port);
+        client.connect(port, host, ()=> {            
+            console.log(host + ' PUERTO ABIERTO: ' + port);
             verJson(port);
             //client.write('');
         });
