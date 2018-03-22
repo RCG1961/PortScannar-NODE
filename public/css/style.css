@@ -64,16 +64,20 @@ html, body{
 }
 
 #center{
-	position: relative;
+	position: fixed;
 	padding-top: 15px;
 	background-color: #010101;
 	height: 90%;
 	padding-left: 30px;
 	padding-right: 20px;
 	text-align: justify;
+	width: 100%;
 	color: #C0C0C0;
 	font-size: .9em;
 	font-family: "Courier New", Courier, monospace;
+	word-wrap: break-word;
+	box-sizing: border-box;
+	overflow-y: auto;
 
 }
 
@@ -86,7 +90,7 @@ html, body{
 	width: 100%;
 	background-color: #010101;
 	bottom: 0;
-	position: absolute;
+	position: fixed;
 	padding-top: 1px;
 	box-sizing: border-box;
 	padding-right: 20px;
