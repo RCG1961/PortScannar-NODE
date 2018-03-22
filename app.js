@@ -14,12 +14,6 @@ app.get('/', function (req, res) {
     res.render('index.html');
 });
 
-
-app.listen(3000, function () {
-    console.log('Listo Para Escanear...');
-    require("openurl").open("http://localhost:3000");
-});
-
 var dato = new Array();
 app.post('/escaner', function (req, res) {
     var HOST = 'localhost';
@@ -27,18 +21,19 @@ app.post('/escaner', function (req, res) {
     var puertoFinal = req.body.portfin;
     var dato = new Array(), promises = [];
     var openPorts = '';
+    var contPorts = 0;
     var datosPort = [];
     for (let port = puertoInicial; port <= puertoFinal; port++) {
         var client = new net.Socket();
         client.setTimeout(1000);
         datosPort = port;
         client.connect(port, HOST, ()=> {            
-            //console.log(HOST + ' PUERTO ABIERTO: ' + port);
+            console.log(HOST + ' PUERTO ABIERTO: ' + port);
             verJson(port);
             //client.write('');
-            // openPorts += ","+port.toString();
         });
         client.on('timeout',(data)=> {
+            contPorts++;
             client.destroy();
         });
 
@@ -49,6 +44,7 @@ app.post('/escaner', function (req, res) {
 
         client.on('close', (err)=> {
             //console.log("Conexión cerrada");
+            
         })
 
         client.on('error', (err)=> {
@@ -57,15 +53,21 @@ app.post('/escaner', function (req, res) {
         
     }
 
-    //res.json(dato);
-    //verJson(dato);
-    setTimeout(()=>{
-        res.json(dato);
-    },3000);
-    // res.send(openPorts);
+    setInterval(()=>{
+        console.log(contPorts);
+        if (puertoFinal - puertoInicial == contPorts){
+            res.json(dato);
+            dato = [];
+        }
+    },1000)
 });
 
 function verJson(arr){
     dato.push(arr);
     console.log(dato);
 }
+
+app.listen(3000, function () {
+    console.log('Listo Para Escanear...');
+    require("openurl").open("http://localhost:3000");
+});
