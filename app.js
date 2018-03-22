@@ -23,6 +23,8 @@ app.post('/escaner', function (req, res) {
     var contPorts = 0;
     var datosPort = [];
     dato= [];
+    var contador=0;
+    var resta = puertoFinal  - puertoInicial;
     for (let port = puertoInicial; port <= puertoFinal; port++) {
         var client = new net.Socket();
         client.setTimeout(1000);
@@ -33,31 +35,30 @@ app.post('/escaner', function (req, res) {
             //client.write('');
         });
         client.on('timeout',(data)=> {
-            contPorts++;
+            //console.log(port);
             client.destroy();
         });
 
         client.on('data',(data)=> {
             // console.log('DATA: ' + data);
-            contPorts++;
             client.destroy();
         });
 
         client.on('close', (err)=> {
             //console.log("Conexión cerrada");
-            
+          //  console.log("hola" + contPorts)
+            contPorts++;
         })
 
         client.on('error', (err)=> {
             // console.log("Error: "+err.message);
-        });
-        
+        }); 
     }
-    console.log("contPorts:"+  contPorts)
-    console.log("resta: " + (puertoFinal - puertoInicial));
+
 
     setInterval(()=>{
-        if (puertoFinal - puertoInicial == contPorts){
+        if (puertoFinal == (contPorts + dato.length)){
+        	console.log("kike")
             res.json(dato);
             dato = [];
         }
