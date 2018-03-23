@@ -8,6 +8,15 @@ app.use('/static', express.static(__dirname + '/public'));
 app.engine('html', engines.mustache);
 app.set('view engine', 'html');
 app.use(bodyParser.json()); // support json encoded bodies
+app.use(function (req, res, next) {
+    req.on('timeout', function () {
+        // pretend like data was written out
+        res.write = res.end = function () { return true };
+        // no headers, plz
+        res.setHeader = res.writeHead = res.addTrailers = function () { };
+    });
+    next();
+})
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.get('/', function (req, res) {
@@ -47,20 +56,28 @@ app.post('/escaner', function (req, res) {
         client.on('close', (err)=> {
             //console.log("Conexión cerrada");
             contPorts++;
+            client.destroy();
         })
 
         client.on('error', (err)=> {
             // console.log("Error: "+err.message);
+            client.destroy();
         }); 
     }
 
-    setInterval(()=>{
+    var respuesta = setInterval(()=>{
+        console.log("TOTAL :", totalPuertos);
+        console.log("CONTADOR: ", contPorts);
         if (totalPuertos == contPorts){
-            res.json(dato);
+            if (dato.length > 0) {
+                res.json(dato);
+            } else {
+                res.json({'Sin Puertos': 'Sin Puertos'});
+            }
+            clearInterval(respuesta);
             dato = [];
         }
     },1000)
-    return false;
 });
 
 function verJson(arr){
