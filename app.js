@@ -19,13 +19,11 @@ app.post('/escaner', function (req, res) {
     var puertoInicial = req.body.portinit;
     var puertoFinal = req.body.portfin;
     var host = req.body.host;
-    
-    var openPorts = '';
+
     var contPorts = 0;
-    var datosPort = [];
-    dato= [];
-    var contador=0;
-    var resta = puertoFinal  - puertoInicial;
+
+    var totalPuertos = puertoFinal  - puertoInicial;
+
     for (let port = puertoInicial; port <= puertoFinal; port++) {
         var client = new net.Socket();
         client.setTimeout(1000);
@@ -42,12 +40,12 @@ app.post('/escaner', function (req, res) {
 
         client.on('data',(data)=> {
             // console.log('DATA: ' + data);
+            contPorts++;
             client.destroy();
         });
 
         client.on('close', (err)=> {
             //console.log("Conexión cerrada");
-          //  console.log("hola" + contPorts)
             contPorts++;
         })
 
@@ -56,21 +54,20 @@ app.post('/escaner', function (req, res) {
         }); 
     }
 
-
     setInterval(()=>{
-        if (puertoFinal == (contPorts + dato.length)){
-        	console.log("kike")
+        if (totalPuertos == contPorts){
             res.json(dato);
             dato = [];
         }
     },1000)
+    return false;
 });
 
 function verJson(arr){
     dato.push(arr);
     console.log(dato);
 }
-
+//TODO:
 app.listen(3000, function () {
     console.log('Listo Para Escanear...');
     //require("openurl").open("http://localhost:3000");
