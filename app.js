@@ -43,7 +43,6 @@ app.post('/escaner', function (req, res) {
             //client.write('');
         });
         client.on('timeout',(data)=> {
-            //console.log(port);
             client.destroy();
         });
 
@@ -54,7 +53,6 @@ app.post('/escaner', function (req, res) {
         });
 
         client.on('close', (err)=> {
-            //console.log("Conexión cerrada");
             contPorts++;
             client.destroy();
         })
@@ -68,7 +66,7 @@ app.post('/escaner', function (req, res) {
     var respuesta = setInterval(()=>{
         console.log("TOTAL :", totalPuertos);
         console.log("CONTADOR: ", contPorts);
-        if (totalPuertos == contPorts){
+        if (totalPuertos == contPorts - dato.length){
             if (dato.length > 0) {
                 res.json(dato);
             } else {
@@ -84,6 +82,28 @@ function verJson(arr){
     dato.push(arr);
     console.log(dato);
 }
+
+app.post('/mysql', function (req, res) {
+    var mysql = require('mysql');
+    var connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'me',
+        password: 'secret',
+        database: 'my_db'
+    });
+
+    connection.connect();
+
+    connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+        if (error) throw error;
+        console.log('The solution is: ', results[0].solution);
+    });
+
+    connection.end();
+    res.json({'respuesta' : 'buena'});
+});
+
+
 //TODO:
 app.listen(3000, function () {
     console.log('Listo Para Escanear...');
