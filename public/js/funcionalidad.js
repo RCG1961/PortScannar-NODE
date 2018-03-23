@@ -2,20 +2,29 @@ var option = document.createElement("option");
 var selectPuertos = document.getElementById('puertosDisponibles');
 var host = 'localhost';
 var estatus = document.getElementById('estado');
+var terminal = document.getElementById('terminal');
+var service = '';
 
 document.getElementById("mensaje").addEventListener('keypress',(e)=>{
     if (e.keyCode == 13){
         document.getElementById("terminal").innerHTML += "<br>"+e.target.value;
+        switch (parseInt(service)) {
+            case 3306:
+                mysqlConnect(e.target.value);
+                break;
+            default:
+                break;
+        }
         document.getElementById("mensaje").value = '';
     }
 });
 
 document.getElementById('btnConectar').addEventListener('click', () => {
     var puerto = selectPuertos.value;
-    console.log(puerto);
+    estatus.innerHTML = 'Esperando Comando...';
     switch (parseInt(puerto)) {
         case 3306:
-            mysqlConnect();
+            service = 3306;
             break;
         case 21:
             alert("ftp");
@@ -80,7 +89,8 @@ var generarOptionsPorts = (ports)=> {
     }
 }
 
-var mysqlConnect = ()=>{
+var contadorId = 0;
+var mysqlConnect = (stament)=>{
     if (localStorage.getItem("usuarioterm") != '') {
         var user = prompt("usuario");
         var termp = prompt("contraseña");
@@ -88,15 +98,61 @@ var mysqlConnect = ()=>{
         localStorage.setItem("termp", termp);
     }
     estatus.innerHTML = 'Conectando con el servicio de MySQL..';
-    alert("mysql");
-    var data = {};
+    var data = { stament: stament};
     $.ajax({
         method: "POST",
         url: "http://localhost:3000/mysql",
         data: data,
     }).done(function (msg) {
-        console.log(msg);
+        estatus.innerHTML = 'Conectado';
+        terminal.innerHTML += "<br>";
+        if (msg.error) {
+            terminal.innerHTML += msg.error.sqlMessage;
+        } else {
+            contadorId++;
+            console.log(msg);
+            generarTablaConsulta(contadorId, msg);
+        }
     }).fail((msg) => {
         alert("fallo");
     });
+}
+
+
+var generarTablaConsulta = (contadorId, data)=>{
+    var tabla = document.createElement("table")
+    tabla.setAttribute("id", contadorId)
+    tabla.setAttribute("border", 1)
+    tabla.style = 'border-style: dashed;';
+    terminal.appendChild(tabla);
+
+    var headers = [];
+    if (data.length > 1) {
+        headers = Object.keys(data[0]);
+    } else {
+        headers = Object.keys(data);
+    }
+    var tabla = document.getElementById(contadorId);
+    var tblBody = document.createElement("tbody");
+    var hilera = document.createElement("tr");
+    for (var j = 0; j < headers.length; j++) {
+        var celda = document.createElement("th");
+        var textoCelda = document.createTextNode(headers[j]);
+        celda.appendChild(textoCelda);
+        hilera.appendChild(celda);
+    }
+    tblBody.appendChild(hilera);
+    tabla.appendChild(tblBody);
+
+    for (const key in data) {
+        var hilera = document.createElement("tr");
+        for (const head in headers) {
+            var celda = document.createElement("td");
+            var textoCelda = document.createTextNode(data[key][headers[head]]);
+            celda.appendChild(textoCelda);
+            hilera.appendChild(celda);
+        }
+        tblBody.appendChild(hilera);
+    }
+    tabla.appendChild(tblBody);
 }
