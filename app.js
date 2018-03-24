@@ -66,7 +66,9 @@ app.post('/escaner', function (req, res) {
     var respuesta = setInterval(()=>{
         console.log("TOTAL :", totalPuertos);
         console.log("CONTADOR: ", contPorts);
-        if (totalPuertos == contPorts - dato.length){
+        console.log("LENGTH: ", dato.length);
+
+        if (totalPuertos  == contPorts ){
             if (dato.length > 0) {
                 res.json(dato);
             } else {
@@ -100,6 +102,22 @@ app.post('/mysql', function (req, res) {
         }
         
     });
+
+    connection.end();
+});
+
+// HTTP
+app.post('/http', function (req, res) {
+    var options= {
+        host: req.body.host,
+        port: 80,
+        path: '/'
+    }
+    var req = http.request(options, function(res) {
+    console.log(JSON.stringify(res.headers));
+      }
+    );
+    req.end();
 
     connection.end();
 });

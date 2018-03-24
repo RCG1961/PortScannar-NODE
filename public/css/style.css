@@ -61,6 +61,7 @@ html, body{
 
 #escanear{
 	margin-left: 40px;
+
 }
 
 #center{
@@ -68,6 +69,7 @@ html, body{
 	padding-top: 15px;
 	background-color: #010101;
 	height: 90%;
+	padding-bottom: 20px;
 	padding-left: 30px;
 	padding-right: 20px;
 	text-align: justify;
@@ -78,6 +80,7 @@ html, body{
 	word-wrap: break-word;
 	box-sizing: border-box;
 	overflow-y: auto;
+	font-style: inherit;
 
 }
 
@@ -158,6 +161,7 @@ button{
 	border-radius: 10px;
 	color: white;
 	cursor: pointer;
+	outline: none;
 }
 
 button:hover{

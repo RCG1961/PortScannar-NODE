@@ -5,6 +5,19 @@ var estatus = document.getElementById('estado');
 var terminal = document.getElementById('terminal');
 var service = '';
 
+// Scroll de la consola
+var textarea = document.getElementById('center');
+var mensaje = document.getElementById('mensaje');
+// mensaje.addEventListener('keyup',function(e){
+//     if (e.keyCode === 13) {
+//     textarea.scrollTop = textarea.scrollHeight;
+//   }
+// });
+
+function ajustarPantalla(){
+    textarea.scrollTop = textarea.scrollHeight;
+}
+
 document.getElementById("mensaje").addEventListener('keypress',(e)=>{
     if (e.keyCode == 13){
         document.getElementById("terminal").innerHTML += "<br>"+e.target.value;
@@ -12,6 +25,8 @@ document.getElementById("mensaje").addEventListener('keypress',(e)=>{
             case 3306:
                 mysqlConnect(e.target.value);
                 break;
+            case 80:
+                console.log("hola kike");
             default:
                 break;
         }
@@ -31,6 +46,7 @@ document.getElementById('btnConectar').addEventListener('click', () => {
             break;
         case 80:
             alert("http");
+            service=80;
             break;
         default:
             alert("Por el momento el servicio no es soportado: Puerto ", puerto);
