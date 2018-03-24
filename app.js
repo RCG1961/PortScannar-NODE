@@ -68,7 +68,7 @@ app.post('/escaner', function (req, res) {
         console.log("CONTADOR: ", contPorts);
         console.log("LENGTH: ", dato.length);
 
-        if (totalPuertos  == contPorts ){
+        if (totalPuertos == contPorts - dato.length){
             if (dato.length > 0) {
                 res.json(dato);
             } else {
@@ -80,7 +80,7 @@ app.post('/escaner', function (req, res) {
     },1000)
 });
 
-function verJson(arr){
+var verJson = (arr)=>{
     dato.push(arr);
     console.log(dato);
 }
@@ -88,10 +88,10 @@ function verJson(arr){
 app.post('/mysql', function (req, res) {
     var mysql = require('mysql');
     var connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'unesco'
+        host: req.body.host,
+        user: req.body.user,
+        password: req.body.pass,
+        database: req.body.database
     });
     connection.connect();
     connection.query(req.body.stament, function (error, results, fields) {
@@ -102,7 +102,6 @@ app.post('/mysql', function (req, res) {
         }
         
     });
-
     connection.end();
 });
 

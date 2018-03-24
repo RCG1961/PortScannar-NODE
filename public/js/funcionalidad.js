@@ -16,11 +16,13 @@ var mensaje = document.getElementById('mensaje');
 
 function ajustarPantalla(){
     textarea.scrollTop = textarea.scrollHeight;
+    console.log(textarea.scrollTop);
 }
 
 document.getElementById("mensaje").addEventListener('keypress',(e)=>{
     if (e.keyCode == 13){
         document.getElementById("terminal").innerHTML += "<br>"+e.target.value;
+        ajustarPantalla();
         switch (parseInt(service)) {
             case 3306:
                 mysqlConnect(e.target.value);
@@ -28,6 +30,7 @@ document.getElementById("mensaje").addEventListener('keypress',(e)=>{
             case 80:
                 console.log("hola kike");
             default:
+                alert("Conectese a un puerto");
                 break;
         }
         document.getElementById("mensaje").value = '';
@@ -36,17 +39,26 @@ document.getElementById("mensaje").addEventListener('keypress',(e)=>{
 
 document.getElementById('btnConectar').addEventListener('click', () => {
     var puerto = selectPuertos.value;
-    estatus.innerHTML = 'Esperando Comando...';
     switch (parseInt(puerto)) {
         case 3306:
+            estatus.innerHTML = 'Esperando Comando...';
             service = 3306;
             break;
         case 21:
+            estatus.innerHTML = 'Esperando Comando...';
             alert("ftp");
             break;
         case 80:
-            alert("http");
-            service=80;
+            estatus.innerHTML = 'Esperando Comando...';
+            service = 80;
+            break;
+        case -21:
+            estatus.innerHTML = 'Esperando Comando...';
+            alert("Realice un escaneo ");
+            break;
+        case -20:
+            estatus.innerHTML = 'Esperando Comando...';
+            alert("Seleccione un puerto");
             break;
         default:
             alert("Por el momento el servicio no es soportado: Puerto ", puerto);
@@ -106,15 +118,42 @@ var generarOptionsPorts = (ports)=> {
 }
 
 var contadorId = 0;
+var databaseSelected = false;
+var database = '';
+var connectedMysql = false;
 var mysqlConnect = (stament)=>{
-    if (localStorage.getItem("usuarioterm") != '') {
+
+    if (!connectedMysql) {
         var user = prompt("usuario");
         var termp = prompt("contraseña");
         localStorage.setItem("usuarioterm", user);
         localStorage.setItem("termp", termp);
+        connectedMysql = true;
     }
+
+    if(stament == 'exit'){
+        alert("salio");
+        desconectar();
+        return null;
+    }
+
+    if (stament.includes("use") && !databaseSelected){
+        database = stament.split("use")[1].trim();
+        // database = database.trim();
+        terminal.innerHTML += "<br>Base de datos seleccionada "+database;
+        console.log(database);
+        databaseSelected = true;
+    }
+
     estatus.innerHTML = 'Conectando con el servicio de MySQL..';
-    var data = { stament: stament};
+    var data = { 
+        host: host, 
+        stament: stament, 
+        database: database, 
+        pass : localStorage.getItem("termp"), 
+        user: localStorage.getItem("usuarioterm")
+    };
+
     $.ajax({
         method: "POST",
         url: "http://localhost:3000/mysql",
@@ -130,7 +169,8 @@ var mysqlConnect = (stament)=>{
             generarTablaConsulta(contadorId, msg);
         }
     }).fail((msg) => {
-        alert("fallo");
+        alert("se ha perdido la conexión");
+        desconectar();
     });
 }
 
@@ -171,4 +211,9 @@ var generarTablaConsulta = (contadorId, data)=>{
         tblBody.appendChild(hilera);
     }
     tabla.appendChild(tblBody);
+}
+
+var desconectar = ()=>{
+    service = -20;
+    connectedMysql = false;
 }
