@@ -62,8 +62,6 @@
   // }
 
     //3.- method POST 
-
-
     var options = {
       hostname: 'www.ptsv2.com',
       port: 443,

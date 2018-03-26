@@ -3,6 +3,7 @@ var app = express();
 var engines = require('consolidate');
 var bodyParser = require('body-parser');
 var net = require('net');
+var http = require('http');
 
 app.use('/static', express.static(__dirname + '/public'));
 app.engine('html', engines.mustache);
@@ -107,18 +108,21 @@ app.post('/mysql', function (req, res) {
 
 // HTTP
 app.post('/http', function (req, res) {
+	var http = require('http')
     var options= {
         host: req.body.host,
         port: 80,
-        path: '/'
+        path: "/"
     }
+    console.log(options)
     var req = http.request(options, function(res) {
-    console.log(JSON.stringify(res.headers));
+    	console.log(JSON.stringify(req.headers));
       }
     );
+    req.on('error', function(err) {
+      console.log(err);
+	})
     req.end();
-
-    connection.end();
 });
 
 
