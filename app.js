@@ -163,6 +163,34 @@ app.post('/http', function (req, res) {
 	}  
 });
 
+mensaje = [];
+app.post('/ssh', function (req, res) {
+    var SSH = require('simple-ssh');
+
+    var ssh = new SSH({
+        host: req.body.host,
+        user: req.body.user,
+        pass: req.body.pass
+    });
+
+    ssh.exec(req.body.stament, {
+        out: function (stdout) {
+            mensaje.push(stdout);
+        }
+    }).start();
+
+
+
+    ssh.on('error', function (err) {
+        ssh.end();
+    });
+
+    setTimeout(() => {
+        res.json({ stdout: mensaje });
+        mensaje = [];
+    }, 3000);
+});
+
 
 //TODO:
 app.listen(3000, function () {

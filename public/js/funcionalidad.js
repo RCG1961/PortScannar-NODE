@@ -19,9 +19,9 @@ function ajustarPantalla(){
     console.log(textarea.scrollTop);
 }
 
-document.getElementById("mensaje").addEventListener('keypress',(e)=>{
-    if (e.keyCode == 13){
-        document.getElementById("terminal").innerHTML += "<br>"+e.target.value;
+document.getElementById("mensaje").addEventListener('keypress', (e) => {
+    if (e.keyCode == 13) {
+        document.getElementById("terminal").innerHTML += "<br>" + e.target.value;
         ajustarPantalla();
         switch (parseInt(service)) {
             case 3306:
@@ -29,6 +29,9 @@ document.getElementById("mensaje").addEventListener('keypress',(e)=>{
                 break;
             case 80:
                 httpConnect(e.target.value);
+                break;
+            case 22:
+                sshConnect(e.target.value);
                 break;
             default:
                 alert("Conectese a un puerto");
@@ -38,16 +41,17 @@ document.getElementById("mensaje").addEventListener('keypress',(e)=>{
     }
 });
 
-document.getElementById('btnConectar').addEventListener('click', () => {
+ocument.getElementById('btnConectar').addEventListener('click', () => {
     var puerto = selectPuertos.value;
     switch (parseInt(puerto)) {
         case 3306:
-            estatus.innerHTML = 'Esperando Comando...';
+            estatus.innerHTML = 'Esperando Comando para MySQL';
             service = 3306;
             break;
-        case 21:
-            estatus.innerHTML = 'Esperando Comando...';
-            alert("ftp");
+        case 22:
+            estatus.innerHTML = 'Esperando Comando para SSH';
+            alert("ssh");
+            service = 22;
             break;
         case 80:
             estatus.innerHTML = 'Esperando Comando...';
@@ -122,7 +126,8 @@ var contadorId = 0;
 var databaseSelected = false;
 var database = '';
 var connectedMysql = false;
-var mysqlConnect = (stament)=>{
+var isUse = false;
+var mysqlConnect = (stament) => {
 
     if (!connectedMysql) {
         var user = prompt("usuario");
@@ -132,26 +137,27 @@ var mysqlConnect = (stament)=>{
         connectedMysql = true;
     }
 
-    if(stament == 'exit'){
+    if (stament == 'exit') {
         alert("salio");
         desconectar();
         return null;
     }
 
-    if (stament.includes("use") && !databaseSelected){
+    if (stament.includes("use") && !databaseSelected) {
         database = stament.split("use")[1].trim();
         // database = database.trim();
-        terminal.innerHTML += "<br>Base de datos seleccionada "+database;
+        terminal.innerHTML += "<br>Base de datos seleccionada " + database;
         console.log(database);
         databaseSelected = true;
+        isUse = true;
     }
 
     estatus.innerHTML = 'Conectando con el servicio de MySQL..';
-    var data = { 
-        host: host, 
-        stament: stament, 
-        database: database, 
-        pass : localStorage.getItem("termp"), 
+    var data = {
+        host: host,
+        stament: stament,
+        database: database,
+        pass: localStorage.getItem("termp"),
         user: localStorage.getItem("usuarioterm")
     };
 
@@ -160,15 +166,20 @@ var mysqlConnect = (stament)=>{
         url: "http://localhost:3000/mysql",
         data: data,
     }).done(function (msg) {
+        console.log(msg);
         estatus.innerHTML = 'Conectado';
         terminal.innerHTML += "<br>";
         if (msg.error) {
             terminal.innerHTML += msg.error.sqlMessage;
+        } else if (isUse) {
+
+        } else if (msg.affectedRows) {
+            terminal.innerHTML = "Columnas afectadas " + msg.affectedRows;
         } else {
             contadorId++;
-            console.log(msg);
             generarTablaConsulta(contadorId, msg);
         }
+        isUse = false;
     }).fail((msg) => {
         alert("se ha perdido la conexión");
         desconectar();
@@ -176,7 +187,7 @@ var mysqlConnect = (stament)=>{
 }
 
 
-var generarTablaConsulta = (contadorId, data)=>{
+var generarTablaConsulta = (contadorId, data) => {
     var tabla = document.createElement("table")
     tabla.setAttribute("id", contadorId)
     tabla.setAttribute("border", 1)
@@ -184,11 +195,8 @@ var generarTablaConsulta = (contadorId, data)=>{
     terminal.appendChild(tabla);
 
     var headers = [];
-    if (data.length > 1) {
-        headers = Object.keys(data[0]);
-    } else {
-        headers = Object.keys(data);
-    }
+    headers = Object.keys(data[0]);
+
     var tabla = document.getElementById(contadorId);
     var tblBody = document.createElement("tbody");
     var hilera = document.createElement("tr");
@@ -200,6 +208,7 @@ var generarTablaConsulta = (contadorId, data)=>{
     }
     tblBody.appendChild(hilera);
     tabla.appendChild(tblBody);
+    console.log(data);
 
     for (const key in data) {
         var hilera = document.createElement("tr");
@@ -287,6 +296,44 @@ var httpConnect = (stament)=>{
     }
 }
 
+var connectedSsh = false;
+var sshConnect = (stament) => {
+
+    if (!connectedSsh) {
+        var user = prompt("usuario");
+        var termp = prompt("contraseña");
+        localStorage.setItem("usuarioterm", user);
+        localStorage.setItem("termp", termp);
+        connectedSsh = true;
+    }
+
+    if (stament == 'exit') {
+        alert("salio");
+        desconectar();
+        return null;
+    }
+
+    estatus.innerHTML = 'Conectando con el servicio de SSH..';
+    var data = {
+        host: host,
+        stament: stament,
+        pass: localStorage.getItem("termp"),
+        user: localStorage.getItem("usuarioterm")
+    };
+
+    $.ajax({
+        method: "POST",
+        url: "http://localhost:3000/ssh",
+        data: data,
+    }).done(function (msg) {
+        console.log(msg);
+        terminal.innerHTML += "<br>";
+        terminal.innerHTML += msg.stdout;
+    }).fail((msg) => {
+        alert("se ha perdido la conexión");
+        desconectar();
+    });
+}
 
 var desconectar = ()=>{
     service = -20;

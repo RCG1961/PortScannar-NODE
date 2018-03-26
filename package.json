@@ -15,7 +15,8 @@
     "openurl": "^1.1.1",
     "ping": "^0.2.2",
     "string_decoder": "^1.1.0",
-    "threads": "^0.10.1"
+    "threads": "^0.10.1",
+    "simple-ssh": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
