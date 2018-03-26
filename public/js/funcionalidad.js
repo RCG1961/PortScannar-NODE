@@ -51,6 +51,7 @@ document.getElementById('btnConectar').addEventListener('click', () => {
         case 80:
             estatus.innerHTML = 'Esperando Comando...';
             service = 80;
+            alert(service)
             break;
         case -21:
             estatus.innerHTML = 'Esperando Comando...';

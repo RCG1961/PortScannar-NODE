@@ -68,7 +68,7 @@ app.post('/escaner', function (req, res) {
         console.log("CONTADOR: ", contPorts);
         console.log("LENGTH: ", dato.length);
 
-        if (totalPuertos == contPorts - dato.length){
+        if ((totalPuertos == contPorts - dato.length) || (puertoFinal == contPorts + dato.length) || (totalPuertos==contPorts)){
             if (dato.length > 0) {
                 res.json(dato);
             } else {
