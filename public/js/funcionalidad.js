@@ -41,7 +41,7 @@ document.getElementById("mensaje").addEventListener('keypress', (e) => {
     }
 });
 
-ocument.getElementById('btnConectar').addEventListener('click', () => {
+document.getElementById('btnConectar').addEventListener('click', () => {
     var puerto = selectPuertos.value;
     switch (parseInt(puerto)) {
         case 3306:
