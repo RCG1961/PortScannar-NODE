@@ -21,8 +21,13 @@ function ajustarPantalla(){
 
 document.getElementById("mensaje").addEventListener('keypress', (e) => {
     if (e.keyCode == 13) {
-        document.getElementById("terminal").innerHTML += "<br>" + e.target.value;
+        terminal.innerHTML += "<br>" + e.target.value;
         ajustarPantalla();
+        if (e.target.value.trim() == "cls" || e.target.value.trim() == "clear" || e.target.value.trim() == "clc"){
+            terminal.innerHTML = '';
+            estatus.innerHTML = 'Esperando...';
+            return null;
+        }
         switch (parseInt(service)) {
             case 3306:
                 mysqlConnect(e.target.value);
