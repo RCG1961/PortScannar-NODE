@@ -195,5 +195,5 @@ app.post('/ssh', function (req, res) {
 //TODO:
 app.listen(3000, function () {
     console.log('Listo Para Escanear...');
-    //require("openurl").open("http://localhost:3000");
+    require("openurl").open("http://localhost:3000");
 });
