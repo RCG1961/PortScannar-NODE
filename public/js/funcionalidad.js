@@ -217,93 +217,74 @@ var generarTablaConsulta = (contadorId, data)=>{
 
 var connectedHttp = false;
 var  path = "/";
+var comando = "";
 var httpConnect = (stament)=>{
+    terminal.innerHTML+= "<br>"
+    var boolComandos  = false; 
 
     
+    if (stament.includes(" ")){ //Si el comando está completo
+        if (!connectedHttp) {
+            // var user = prompt("usuario");
+            // var termp = prompt("contraseña");
+            // localStorage.setItem("usuarioterm", user);
+            // localStorage.setItem("termp", termp);
+            connectedHttp = true;
+        }
 
-    
+        if(stament == 'exit'){
+            alert("salió");
+            desconectar();
+            return null;
+        }
 
-    if (!connectedHttp) {
-        // var user = prompt("usuario");
-        // var termp = prompt("contraseña");
-        // localStorage.setItem("usuarioterm", user);
-        // localStorage.setItem("termp", termp);
-        connectedHttp = true;
-    }
+        if (stament.substring(0,4).toLowerCase() == "head"){
+            path  = stament.split(" ")[1].trim();
+            comando = "header"
+            boolComandos = true;
+        }
 
-    if(stament == 'exit'){
-        alert("salió");
-        desconectar();
-        return null;
-    }
-
-    if (stament.includes("head")){
-        path  = stament.split(" ")[1].trim();
+        if  (stament.substring(0,3).toLowerCase() == "get"){
+            path  = stament.split(" ")[1].trim();
+            comando = "get"
+            boolComandos = true;
+        }
     }
 
     estatus.innerHTML = 'Conectando con el servicio de HTTP..';
 
-    var options= { 
+    var data= { 
         host: host,
         port: 80,
-        path: "/"
+        path: path,
+        comando : comando
     }
-    console.log(options)
-    alert(options.host);
-    $.ajax({
-        method: "POST",
-        url: "http://localhost:3000/http",
-        options: options,
-    }).done(function (msg) {
-        estatus.innerHTML = 'Conectado';
-        terminal.innerHTML += "<br>";
-        // if (msg.error) {
-        //     terminal.innerHTML += msg.error.sqlMessage;
-        // } else {
-        //     contadorId++;
-        //     console.log(msg);
-        //     generarTablaConsulta(contadorId, msg);
-        // }
-    }).fail((msg) => {
-        alert("se ha perdido la conexión");
-        desconectar();
-    });
-
-    // if (stament.includes("use") && !databaseSelected){
-    //     database = stament.split("use")[1].trim();
-    //     // database = database.trim();
-    //     terminal.innerHTML += "<br>Base de datos seleccionada "+database;
-    //     console.log(database);
-    //     databaseSelected = true;
-    // }
-
-    // estatus.innerHTML = 'Conectando con el servicio de MySQL..';
-    // var data = { 
-    //     host: host, 
-    //     stament: stament, 
-    //     database: database, 
-    //     pass : localStorage.getItem("termp"), 
-    //     user: localStorage.getItem("usuarioterm")
-    // };
-
-    // $.ajax({
-    //     method: "POST",
-    //     url: "http://localhost:3000/mysql",
-    //     data: data,
-    // }).done(function (msg) {
-    //     estatus.innerHTML = 'Conectado';
-    //     terminal.innerHTML += "<br>";
-    //     if (msg.error) {
-    //         terminal.innerHTML += msg.error.sqlMessage;
-    //     } else {
-    //         contadorId++;
-    //         console.log(msg);
-    //         generarTablaConsulta(contadorId, msg);
-    //     }
-    // }).fail((msg) => {
-    //     alert("se ha perdido la conexión");
-    //     desconectar();
-    // });
+    console.log(data)
+    if (boolComandos){
+        $.ajax({
+            method: "POST",
+            url: "http://localhost:3000/http",
+            data: data,
+        }).done(function (msg) {
+            estatus.innerHTML = 'Conectado';
+                if(data.comando == "get"){
+                    terminal.textContent += msg;
+                    terminal.innerHTML += "<br>"
+                }
+                else {
+                    terminal.innerHTML+= msg;
+                    terminal.innerHTML+= "<br>"
+                }
+                terminal.innerHTML += "<br>"
+        }).fail((msg) => {
+            alert("se ha perdido la conexión");
+            desconectar();
+        });
+    }
+    else{
+        terminal.innerHTML += "<br>"
+        terminal.innerHTML += "Debes de ingresar un comando válido"
+    }
 }
 
 

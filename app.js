@@ -4,6 +4,10 @@ var engines = require('consolidate');
 var bodyParser = require('body-parser');
 var net = require('net');
 var http = require('http');
+var fs = require('fs');
+var StringDecoder = require('string_decoder').StringDecoder;
+
+
 
 app.use('/static', express.static(__dirname + '/public'));
 app.engine('html', engines.mustache);
@@ -108,21 +112,55 @@ app.post('/mysql', function (req, res) {
 
 // HTTP
 app.post('/http', function (req, res) {
+
 	var http = require('http')
+	var header = "";
+	var body = "";
+	var file = "";
     var options= {
         host: req.body.host,
         port: 80,
-        path: "/"
-    }
+        path: req.body.path
+    };
+    var comando = req.body.comando
     console.log(options)
-    var req = http.request(options, function(res) {
-    	console.log(JSON.stringify(req.headers));
-      }
-    );
-    req.on('error', function(err) {
-      console.log(err);
-	})
-    req.end();
+    switch (comando){
+    	case "header":
+	    	var request = http.request(options, function(results) {
+	    		header = JSON.stringify(results.headers);
+	    		res.json(header)
+	      		}
+	  	  	);
+	    	request.on('error', function(err) {
+	      		console.log(err);
+			})
+	    	request.end();
+	    	break;
+	    case "get":
+		        var tipoArchivo = options.path.slice(-4)
+		        http.get(options, function(results) {
+          		var content = results.headers['content-type']
+		             if ( content.includes("html")){ // si es html o http
+               			 var decoder = new StringDecoder('utf8');
+		                results.on('data', function (chunk) {
+		                	body += decoder.write(chunk);
+		              });
+		                results.on('end', function(){
+		                	res.json(body);
+		                });
+		             }else {
+		              var file = fs.createWriteStream("downloads/file" + tipoArchivo);
+		                var request = http.get(options, function(response) {
+		                  response.pipe(file);
+		                });
+		                body = "Archivo descargado en la carpeta downloads";
+		                res.json(body);
+		            }
+		        }).on('error', function(e) {
+		            body = "Error: " + e.message;
+		        });
+		        break;
+	}  
 });
 
 
